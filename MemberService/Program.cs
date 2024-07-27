@@ -1,5 +1,6 @@
 using MemberService.Data;
 using MemberService.Models;
+using MemberService.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 
 builder.Services.AddDbContext<AppDbContext>((options) =>
 {
