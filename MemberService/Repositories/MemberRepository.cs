@@ -3,6 +3,10 @@ using MemberService.DTOs;
 using MemberService.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace MemberService.Repositories
 {
@@ -11,7 +15,7 @@ namespace MemberService.Repositories
         Task<IEnumerable<Member>> GetAllAsync();
         Task<Member> GetByIdAsync(string id);
         Task<Member> AddAsync(MemberRegisterDTO member);
-        Task<Member> LoginAsync(MemberLoginDTO member);
+        Task<string> LoginAsync(MemberLoginDTO member);
         Task UpdateAsync(Member member);
         Task DeleteAsync(string id);
     }
@@ -21,16 +25,19 @@ namespace MemberService.Repositories
         private readonly UserManager<Member> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly AppDbContext _context;
+        private readonly IConfiguration config;
 
         public MemberRepository(
             UserManager<Member> userManager,
             RoleManager<IdentityRole> roleManager,
-            AppDbContext context
+            AppDbContext context,
+            IConfiguration config
         )
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             _context = context;
+            this.config = config;
         }
 
         public async Task<IEnumerable<Member>> GetAllAsync()
@@ -50,21 +57,22 @@ namespace MemberService.Repositories
                 UserName = member.Email,
                 Email = member.Email,
                 FirstName = member.FirstName,
-                LastName = member.LastName
+                LastName = member.LastName,
             };
 
             // check if already exuists
+
             var user = await userManager.FindByEmailAsync(member.Email);
 
             if (user != null)
             {
-                return null;
+                throw new Exception("User already exists");
             }
 
             var newUser = await userManager.CreateAsync(newMember, member.Password);
             if (!newUser.Succeeded)
             {
-                return null;
+                throw new Exception("Failed to create user");
             }
 
             var roleCheck = await roleManager.RoleExistsAsync("Admin");
@@ -81,7 +89,7 @@ namespace MemberService.Repositories
             return newMember;
         }
 
-        public async Task<Member> LoginAsync(MemberLoginDTO member)
+        public async Task<string> LoginAsync(MemberLoginDTO member)
         {
             var user = await userManager.FindByEmailAsync(member.Email);
             if (user == null) {
@@ -94,7 +102,11 @@ namespace MemberService.Repositories
                 return null;
             }
 
-            return user;
+            var userRoles = await userManager.GetRolesAsync(user);
+            var userSession = new MemberSession(user.Email, userRoles.ToList());
+            string token = GenerateToken(userSession);
+
+            return token;
         }
 
         public async Task UpdateAsync(Member member)
@@ -112,5 +124,30 @@ namespace MemberService.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        private string GenerateToken(MemberSession user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var userClaims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Email, user.Email)
+        };
+            userClaims.AddRange(user.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+            var audiences = config.GetSection("Jwt:Audiences").Get<List<string>>();
+            userClaims.AddRange(audiences.Select(audience => new Claim(JwtRegisteredClaimNames.Aud, audience)));
+
+            var token = new JwtSecurityToken(
+                issuer: config["Jwt:Issuer"],
+                claims: userClaims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
+
+    public record MemberSession(string Email, List<string> Roles);
 }

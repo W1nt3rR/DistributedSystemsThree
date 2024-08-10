@@ -1,6 +1,7 @@
 ﻿using MemberService.DTOs;
 using MemberService.Models;
 using MemberService.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,14 +41,15 @@ namespace MemberService.Controllers
         [Route("register")]
         public async Task<IActionResult> Register(MemberRegisterDTO member)
         {
-            var newMember = await memberRepository.AddAsync(member);
-
-            if (newMember == null)
+            try
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                var newMember = await memberRepository.AddAsync(member);
+                return Ok(newMember);
             }
-
-            return Ok(newMember);
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
         }
 
         [HttpPost]
@@ -62,6 +64,14 @@ namespace MemberService.Controllers
             }
 
             return Ok(user);
+        }
+
+        [HttpGet]
+        [Route("test")]
+        //[Authorize]
+        public IActionResult Test()
+        {
+            return Ok("Test");
         }
 
     }

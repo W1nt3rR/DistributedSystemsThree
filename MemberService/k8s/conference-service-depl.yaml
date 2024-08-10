@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: conference-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: conference-service
+  template:
+    metadata:
+      labels:
+        app: conference-service
+    spec:
+      containers:
+        - name: conference-service
+          image: w1nt3rr/conference-service:latest
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: conference-service-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: conference-service
+  ports:
+  - name: conference-service
+    protocol: TCP
+    port: 8080
+    targetPort: 8080

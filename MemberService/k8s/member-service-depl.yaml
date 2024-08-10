@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: member-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: member-service
+  template:
+    metadata:
+      labels:
+        app: member-service
+    spec:
+      containers:
+        - name: member-service
+          image: w1nt3rr/member-service:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: member-service-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: member-service
+  ports:
+  - name: member-service
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
