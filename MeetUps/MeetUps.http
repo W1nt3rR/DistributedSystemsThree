@@ -1,6 +1,0 @@
-@MeetUps_HostAddress = http://localhost:5167
-
-GET {{MeetUps_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
