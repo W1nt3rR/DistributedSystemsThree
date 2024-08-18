@@ -4,12 +4,6 @@ metadata:
   name: ingress-srv
   annotations:
     nginx.ingress.kubernetes.io/use-regex: 'true'
-    # nginx.ingress.kubernetes.io/auth-signin: "http://acme.com/api/Nanny/LogIn" # URL to redirect to for sign in
-    # nginx.ingress.kubernetes.io/auth-url: "http://acme.com/api/Nanny/Authorize" # URL to your nannies auth endpoint
-    # nginx.ingress.kubernetes.io/auth-response-headers: "Authorization" # Forward the Authorization header
-    # nginx.ingress.kubernetes.io/proxy-connect-timeout: "600s"
-    # nginx.ingress.kubernetes.io/proxy-read-timeout: "600s"
-    # nginx.ingress.kubernetes.io/proxy-send-timeout: "600s"
 spec:
   ingressClassName: nginx
   rules:
