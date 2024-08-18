@@ -4,8 +4,6 @@ package proto;
 
 option csharp_namespace = "MemberService.Protos"; // This is for .NET namespace mapping
 
-//protoc --go_out=. --go-grpc_out=. proto/signup_member.proto
-
 message Signup {
   string member_jwt_token = 1;
   string conference_id = 2;
