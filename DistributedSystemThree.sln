@@ -5,7 +5,7 @@ VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemberService", "MemberService\MemberService.csproj", "{D80FEC72-43AD-45E3-A6DF-BF99A24D81BD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConferenceService", "..\ds-three-conference\ConferenceService\ConferenceService.csproj", "{1D8B4BEF-F3C1-4B44-9C13-6CDF68C43EF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConferenceService", "ConferenceService\ConferenceService.csproj", "{1D8B4BEF-F3C1-4B44-9C13-6CDF68C43EF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
