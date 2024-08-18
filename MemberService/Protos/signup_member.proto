@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto;
+
+option csharp_namespace = "MemberService.Protos"; // This is for .NET namespace mapping
+
+//protoc --go_out=. --go-grpc_out=. proto/signup_member.proto
+
+message Signup {
+  string member_jwt_token = 1;
+  string conference_id = 2;
+}
+
+message SignupResponse {
+  bool approved = 1;
+  string message = 2;
+}
+
+service SignupService {
+  rpc SignupMember(Signup) returns (SignupResponse);
+}

@@ -1,6 +1,7 @@
 ﻿using MemberService.Data;
 using MemberService.DTOs;
 using MemberService.Models;
+using MemberService.SyncDataService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +19,7 @@ namespace MemberService.Repositories
         Task<string> LoginAsync(MemberLoginDTO member);
         Task UpdateAsync(Member member);
         Task DeleteAsync(string id);
+        Task<bool> Signup(string memberToken, string conferenceId);
     }
 
     public class MemberRepository : IMemberRepository
@@ -25,18 +27,21 @@ namespace MemberService.Repositories
         private readonly UserManager<Member> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly AppDbContext _context;
+        private readonly IEventDataClient eventDataClient;
         private readonly IConfiguration config;
 
         public MemberRepository(
             UserManager<Member> userManager,
             RoleManager<IdentityRole> roleManager,
             AppDbContext context,
+            IEventDataClient eventDataClient,
             IConfiguration config
         )
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             _context = context;
+            this.eventDataClient = eventDataClient;
             this.config = config;
         }
 
@@ -146,6 +151,11 @@ namespace MemberService.Repositories
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<bool> Signup(string memberToken, string conferenceId)
+        {
+            return await eventDataClient.Signup(memberToken, conferenceId);
         }
     }
 

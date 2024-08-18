@@ -1,6 +1,7 @@
 using MemberService.Data;
 using MemberService.Models;
 using MemberService.Repositories;
+using MemberService.SyncDataService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+builder.Services.AddScoped<IEventDataClient, EventDataClient>();
 
 builder.Services.AddDbContext<AppDbContext>((options) =>
 {

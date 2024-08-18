@@ -66,6 +66,21 @@ namespace MemberService.Controllers
             return Ok(user);
         }
 
+        [HttpPost]
+        [Route("SignUp/{eventId}")]
+        public async Task<IActionResult> SignUp(string eventId)
+        {
+            string memberToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var result = await memberRepository.Signup(memberToken, eventId);
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
         [HttpGet]
         [Route("test")]
         //[Authorize]
