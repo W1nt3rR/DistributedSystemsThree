@@ -26,7 +26,7 @@ namespace ConferenceService.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(int id)
         {
             var member = await conferenceRepository.GetByIdAsync(id);
             if (member == null)

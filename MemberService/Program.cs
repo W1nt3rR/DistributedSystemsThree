@@ -1,3 +1,4 @@
+using MemberService.AsyncDataServices;
 using MemberService.Data;
 using MemberService.Models;
 using MemberService.Repositories;
@@ -21,6 +22,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<IEventDataClient, EventDataClient>();
+
+builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
 
 builder.Services.AddDbContext<AppDbContext>((options) =>
 {

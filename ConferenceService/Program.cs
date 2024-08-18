@@ -1,4 +1,6 @@
+using ConferenceService.AsyncDataServices;
 using ConferenceService.Data;
+using ConferenceService.EventProcessing;
 using ConferenceService.Models;
 using ConferenceService.Repositories;
 using MemberService.Data;
@@ -20,6 +22,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IConferenceRepository, ConferenceRepository>();
+builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
 
 builder.Services.AddDbContext<AppDbContext>((options) =>
 {
@@ -55,6 +58,8 @@ builder.Services.AddSwaggerGen(options =>
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
+
+builder.Services.AddHostedService<MessageBusSubscriber>();
 
 var app = builder.Build();
 

@@ -12,7 +12,7 @@ namespace MemberService.SyncDataService
             _configuration = configuration;
         }
 
-        public async Task<bool> Signup(string memberToken, string conferenceId)
+        public async Task<bool> Signup(string memberToken, int conferenceId)
         {
             Console.WriteLine("Calling gRPC Service: " + _configuration["GrpcPlatform"]);
 
@@ -25,7 +25,7 @@ namespace MemberService.SyncDataService
             var request = new Signup
             {
                 MemberJwtToken = memberToken,
-                ConferenceId = conferenceId,
+                ConferenceId = conferenceId.ToString(),
             };
 
             Console.WriteLine("Sending gRPC Request: " + request);

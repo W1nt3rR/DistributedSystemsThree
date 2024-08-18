@@ -27,7 +27,7 @@ namespace MemberService.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(int id)
         {
             var member = await memberRepository.GetByIdAsync(id);
             if (member == null)
@@ -68,10 +68,10 @@ namespace MemberService.Controllers
 
         [HttpPost]
         [Route("SignUp/{eventId}")]
-        public async Task<IActionResult> SignUp(string eventId)
+        public async Task<IActionResult> SignUp(int conferenceId)
         {
             string memberToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            var result = await memberRepository.Signup(memberToken, eventId);
+            var result = await memberRepository.Signup(memberToken, conferenceId);
 
             if (result)
             {

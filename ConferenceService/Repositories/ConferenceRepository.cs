@@ -12,7 +12,7 @@ namespace ConferenceService.Repositories
     public interface IConferenceRepository
     {
         Task<IEnumerable<Conference>> GetAllAsync();
-        Task<Conference> GetByIdAsync(string id);
+        Task<Conference> GetByIdAsync(int id);
         Task UpdateAsync(Conference member);
         Task DeleteAsync(string id);
     }
@@ -36,7 +36,7 @@ namespace ConferenceService.Repositories
             return await _context.Conferences.ToListAsync();
         }
 
-        public async Task<Conference> GetByIdAsync(string id)
+        public async Task<Conference> GetByIdAsync(int id)
         {
             return await _context.Conferences.FindAsync(id);
         }

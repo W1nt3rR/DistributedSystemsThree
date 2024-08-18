@@ -2,6 +2,6 @@
 {
     public interface IEventDataClient
     {
-        Task<bool> Signup(string memberToken, string conferenceId);
+        Task<bool> Signup(string memberToken, int conferenceId);
     }
 }

@@ -5,6 +5,7 @@ using MemberService.SyncDataService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MemberService.AsyncDataServices;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -14,12 +15,12 @@ namespace MemberService.Repositories
     public interface IMemberRepository
     {
         Task<IEnumerable<Member>> GetAllAsync();
-        Task<Member> GetByIdAsync(string id);
+        Task<Member> GetByIdAsync(int id);
         Task<Member> AddAsync(MemberRegisterDTO member);
         Task<string> LoginAsync(MemberLoginDTO member);
         Task UpdateAsync(Member member);
         Task DeleteAsync(string id);
-        Task<bool> Signup(string memberToken, string conferenceId);
+        Task<bool> Signup(string memberToken, int conferenceId);
     }
 
     public class MemberRepository : IMemberRepository
@@ -28,6 +29,7 @@ namespace MemberService.Repositories
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly AppDbContext _context;
         private readonly IEventDataClient eventDataClient;
+        private readonly IMessageBusClient messageBusClient;
         private readonly IConfiguration config;
 
         public MemberRepository(
@@ -35,6 +37,7 @@ namespace MemberService.Repositories
             RoleManager<IdentityRole> roleManager,
             AppDbContext context,
             IEventDataClient eventDataClient,
+            IMessageBusClient messageBusClient,
             IConfiguration config
         )
         {
@@ -42,6 +45,7 @@ namespace MemberService.Repositories
             this.roleManager = roleManager;
             _context = context;
             this.eventDataClient = eventDataClient;
+            this.messageBusClient = messageBusClient;
             this.config = config;
         }
 
@@ -50,7 +54,7 @@ namespace MemberService.Repositories
             return await _context.Members.ToListAsync();
         }
 
-        public async Task<Member> GetByIdAsync(string id)
+        public async Task<Member> GetByIdAsync(int id)
         {
             return await _context.Members.FindAsync(id);
         }
@@ -153,8 +157,22 @@ namespace MemberService.Repositories
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<bool> Signup(string memberToken, string conferenceId)
+        public async Task<bool> Signup(string memberToken, int conferenceId)
         {
+            CheckConferenceDTO checkConferenceDTO = new CheckConferenceDTO
+            {
+                eventMessage = "check_conference",
+                token = memberToken,
+                ConferenceId = conferenceId,
+            };
+
+            bool checkConference = await messageBusClient.CheckConference(checkConferenceDTO);
+
+            if (!checkConference)
+            {
+                return false;
+            }
+
             return await eventDataClient.Signup(memberToken, conferenceId);
         }
     }
